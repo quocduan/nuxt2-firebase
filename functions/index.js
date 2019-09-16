@@ -23,21 +23,29 @@ const app = express();
 //   }
 // };
 // const nuxt = new Nuxt(config);
+const isProd = (process.env.NODE_ENV === 'production')
+// const port = process.env.PORT || 3000
+const port = process.env.PORT || 5000
+console.log(`---------------------${isProd}--------------------`)
 const nuxtConfig = require('./nuxt.config.js');
+nuxtConfig.dev = !isProd
+// https://www.npmjs.com/package/nuxt
+nuxtConfig.dev=false
 const nuxt = new Nuxt(nuxtConfig);
 
-function handleRequest(req, res) {
-  console.log("IN New Nuxt Trial: ");
-  const isProduction = process.env.NODE_ENV === "development" ? false : true;
-  if (isProduction)
-    res.set("Cache-Control", "public, max-age=150, s-maxage=150");
-
-  try {
-    nuxt.render(req, res);
-  } catch (err) {
-    console.error(err);
-  }
+async function handleRequest(req, res) {
+  // res.set('Cache-Control', 'public, max-age=600, s-maxage=1200')
+  await nuxt.ready()
+  nuxt
+    .renderRoute('/')
+    .then((result) => {
+      console.log('-------------------balallalalala------------')
+      res.send(result.html)
+    })
+    .catch((e) => {
+      console.log('-----------------------------erororororor---------------')
+      res.send(e)
+    })
 }
-
-app.use(handleRequest);
+app.get('*', handleRequest)
 exports.nuxtssr = functions.https.onRequest(app);

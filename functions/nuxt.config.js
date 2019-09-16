@@ -56,6 +56,7 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
+    publicPath: '/assets/',
     extend (config, ctx) {
     }
   }
